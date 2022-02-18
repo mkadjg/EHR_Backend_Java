@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -13,24 +14,12 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Person extends BaseModel {
+public class Person extends BaseModel implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "person_id", nullable = false, unique = true)
     private Integer personId;
-
-    @OneToOne(mappedBy = "doctor", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private Doctor doctor;
-
-    @OneToOne(mappedBy = "nurse", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private Nurse nurse;
-
-    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private Patient patient;
     
     @Column(name = "person_title", nullable = false, length = 3)
     private String personTitle;

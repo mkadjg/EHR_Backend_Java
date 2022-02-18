@@ -9,25 +9,19 @@ import java.util.Date;
 @MappedSuperclass
 public class BaseModel {
 
-    private String createdBy;
+    private String modifiedBy;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
-
-    private String updatedBy;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
+    private Date modifiedDate;
 
     @PrePersist
     public void prePersist() {
-        this.createdDate = new Date();
-        this.updatedDate = new Date();
+        this.modifiedDate = new Date();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedDate = new Date();
+        this.modifiedDate = new Date();
     }
 
 

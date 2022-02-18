@@ -17,7 +17,7 @@ public class Users extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "users_id", nullable = false, unique = true)
-    private String usersId;
+    private Integer usersId;
 
     @Column(name = "username", nullable = false)
     private String username;

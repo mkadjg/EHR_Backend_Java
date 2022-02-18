@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +36,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
             .and()
             .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
             .addFilter(new JwtCredentialAuthenticationFilter(new CustomAuthenticationManager(), usersRepository, jwtConfig))
+            .authorizeRequests()
+            .and()
+            .addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
             .antMatchers("/user-management").permitAll()

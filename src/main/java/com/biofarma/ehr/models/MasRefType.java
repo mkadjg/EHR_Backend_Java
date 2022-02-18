@@ -18,9 +18,6 @@ public class MasRefType extends BaseModel {
     @Column(name = "masref_type_id", nullable = false, unique = true)
     private Integer masrefTypeId;
 
-    @Column(name = "masref_keterangan", nullable = false, length = 75)
-    private String masrefKeterangan;
-
     @Column(name = "masref_desc", nullable = false, length = 75)
     private String masrefDesc;
 

@@ -6,17 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "patient")
+@Table(name = "nurse")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Nurse extends BaseModel {
-    
+public class Nurse extends BaseModel implements Serializable {
+
     @Id
+    @Column(name = "nurse_id", nullable = false, unique = true)
+    private Integer nurseId;
+
     @OneToOne
     @MapsId
-    @JoinColumn(name = "nurse_id")
-    private Person nurseId;
+    @JoinColumn(name = "nurse_id", nullable = false, unique = true)
+    private Person person;
+
 }
