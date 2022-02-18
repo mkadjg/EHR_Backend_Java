@@ -6,6 +6,9 @@ import com.biofarma.ehr.dtos.requests.common.RequestDto;
 import com.biofarma.ehr.dtos.responses.ResponseLoginDto;
 import com.biofarma.ehr.dtos.responses.common.ResponseDataDto;
 import com.biofarma.ehr.dtos.responses.common.ResponseDto;
+import com.biofarma.ehr.models.Person;
+import com.biofarma.ehr.models.PersonLogin;
+import com.biofarma.ehr.repositories.PersonLoginRepository;
 import com.biofarma.ehr.repositories.UsersRepository;
 import com.biofarma.ehr.utilities.constants.UserManagementTypeConstant;
 import com.fasterxml.jackson.core.JsonParser;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class JwtCredentialAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -38,12 +42,12 @@ public class JwtCredentialAuthenticationFilter extends UsernamePasswordAuthentic
 
     private final JwtConfig jwtConfig;
 
-    private final UsersRepository usersRepository;
+    private final PersonLoginRepository personLoginRepository;
 
-    public JwtCredentialAuthenticationFilter(CustomAuthenticationManager authManager, UsersRepository usersRepository, JwtConfig jwtConfig) {
+    public JwtCredentialAuthenticationFilter(CustomAuthenticationManager authManager, PersonLoginRepository personLoginRepository, JwtConfig jwtConfig) {
         this.authManager = authManager;
         this.jwtConfig = jwtConfig;
-        this.usersRepository = usersRepository;
+        this.personLoginRepository = personLoginRepository;
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(jwtConfig.getUri(), "POST"));
     }
 
@@ -53,9 +57,9 @@ public class JwtCredentialAuthenticationFilter extends UsernamePasswordAuthentic
         try {
             RequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), RequestDto.class);
             LoginDto userCredentials = new ObjectMapper().convertValue(requestDto.getData().getAttributes(), LoginDto.class);
-            CustomAuthenticationToken authToken = new CustomAuthenticationToken(userCredentials.getUsername(),
+            CustomAuthenticationToken authToken = new CustomAuthenticationToken(userCredentials.getEmail(),
                     userCredentials.getPassword());
-            return authManager.authenticate(authToken, usersRepository);
+            return authManager.authenticate(authToken, personLoginRepository, jwtConfig);
         } catch (IOException e) {
             throw new UsernameNotFoundException("Invalid username or password");
         }
@@ -79,12 +83,13 @@ public class JwtCredentialAuthenticationFilter extends UsernamePasswordAuthentic
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
-            ResponseLoginDto responseLoginDto = new ResponseLoginDto();
-            responseLoginDto.setToken(token);
+            ResponseLoginDto attributes = mapper.convertValue(auth.getDetails(), ResponseLoginDto.class);
+            attributes.setToken(token);
 
             ResponseDataDto responseDataDto = new ResponseDataDto();
-            responseDataDto.setAttributes(responseLoginDto);
+            responseDataDto.setAttributes(attributes);
             responseDataDto.setType(UserManagementTypeConstant.USER_AUTH_TYPE);
+            responseDataDto.setId(String.valueOf(attributes.getPersonId()));
 
             ResponseDto responseDto = new ResponseDto();
             responseDto.setData(responseDataDto);

@@ -1,5 +1,6 @@
 package com.biofarma.ehr.auth;
 
+import com.biofarma.ehr.repositories.PersonLoginRepository;
 import com.biofarma.ehr.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +22,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
     private JwtConfig jwtConfig;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private PersonLoginRepository personLoginRepository;
 
     @Autowired
     private CorsFilter corsFilter;
@@ -35,7 +36,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
             .and()
             .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
-            .addFilter(new JwtCredentialAuthenticationFilter(new CustomAuthenticationManager(), usersRepository, jwtConfig))
+            .addFilter(new JwtCredentialAuthenticationFilter(new CustomAuthenticationManager(), personLoginRepository, jwtConfig))
             .authorizeRequests()
             .and()
             .addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
